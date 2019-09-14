@@ -16,9 +16,10 @@ import java.util.ArrayList;
 
 /**
 * ImageAdapter class for converting image item into view item
-*
 */
 public class ImageAdapter extends BaseAdapter {
+
+    //Set variables
     private Activity context;
     private ArrayList<String> images;
 
@@ -26,34 +27,50 @@ public class ImageAdapter extends BaseAdapter {
 
     /**
      * Instantiates a new image adapter
-     * @param localContext activity
+     * @param localContext
      */
     public ImageAdapter(Activity localContext){
         context = localContext;
         marshmallowPermission = new MarshmallowPermission(this.context);
+        //Get all images path in device storage
         this.images = getAllShownImagesPath(context);
-
     }
 
     /**
-     * Getter and Setters for Adapter
+     * Methods for Adapter: get size of images
+     * @return int size
      * */
     @Override
     public int getCount() {
         return images.size();
     }
 
+    /**
+     * Methods for Adapter: get item by position
+     * @return Object
+     * */
     @Override
     public Object getItem(int position) {
         return position;
     }
 
+    /**
+     * Methods for Adapter: get item ID
+     * @return long position
+     * */
     @Override
     public long getItemId(int position) {
         return position;
     }
 
 
+    /**
+     * Methods for Adapter: get view
+     * @param position
+     * @param convertView
+     * @param parent
+     * @return View picturesView
+     * */
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         ImageView picturesView;
@@ -67,7 +84,6 @@ public class ImageAdapter extends BaseAdapter {
             picturesView = (ImageView) convertView;
         }
 
-
         //Use Glide to load image from device and put into ImageView
         Glide.with(context).load(images.get(position))
                 .placeholder(R.drawable.ic_launcher_background).centerCrop()
@@ -76,15 +92,18 @@ public class ImageAdapter extends BaseAdapter {
         return picturesView;
     }
 
+    /**
+     * Get images list
+     * @return ArrayList<String> images
+     * */
     public ArrayList<String> getImages(){
         return images;
     }
 
     /**
      * Get arraylist of all images path
-     *
      * @param activity
-     * @return ArrayList<String> of all images path
+     * @return ArrayList<String> listOfAllImages (all images path)
      * */
     private ArrayList<String> getAllShownImagesPath(Activity activity){
         Log.d("getAllShownImagesPath","IS RANNNNN");
@@ -101,7 +120,7 @@ public class ImageAdapter extends BaseAdapter {
             //Get path to media storage
             uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
 
-            //project to primary bucket display name of this media item
+            //Project to primary bucket display name of this media item
             String[] projection = {
                     MediaStore.MediaColumns.DATA, MediaStore.Images.Media.BUCKET_DISPLAY_NAME
             };
@@ -117,7 +136,6 @@ public class ImageAdapter extends BaseAdapter {
                 absolutePathOfImage = cursor.getString(column_idx_data);
                 listOfAllImages.add(absolutePathOfImage);
             }
-
             return listOfAllImages;
         }
         return listOfAllImages;

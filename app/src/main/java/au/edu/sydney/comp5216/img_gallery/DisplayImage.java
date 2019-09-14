@@ -7,29 +7,29 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.theartofdev.edmodo.cropper.CropImage;
-import com.theartofdev.edmodo.cropper.CropImageView;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 
+
+/**
+ * Display Image Activity
+ * */
 public class DisplayImage extends AppCompatActivity {
     ImageView iv;
-    CropImageView cropImageView;
     String imgPath;
     Uri croppedUri;
 
-    private static final int CROPPING = 1;
-
+    /**
+     * Display image view
+     * @param savedInstanceState
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -45,19 +45,23 @@ public class DisplayImage extends AppCompatActivity {
         iv.setTag(imgPath);
 
 
+        /**
+         * When click Crop
+         * @param v view
+         */
         Button cropBtn = (Button) findViewById(R.id.cropping);
         cropBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Uri imgUri = Uri.fromFile(new File(imgPath));
 
+                //Start CropImage activity with original image
                 if(iv.getTag() == imgPath){
-                    //Start CropImage activity
                     CropImage.activity(imgUri)
                             .start(DisplayImage.this);
                 }
+                //Start CropImage activity with cropped image
                 else{
-                    //Start CropImage activity
                     CropImage.activity(croppedUri)
                             .start(DisplayImage.this);
                 }
@@ -66,34 +70,32 @@ public class DisplayImage extends AppCompatActivity {
         });
     }
 
+    /**
+     * Method for going back to Grid view gallery
+     * @param v
+     */
     public void displayMain(View v){
         Intent intent = new Intent(this, MainActivity.class);
         startActivity(intent);
 
+        //Show toast when no change is made
         if(iv.getTag().toString() == imgPath){
             Toast.makeText(
                     getApplicationContext(),
                     "Saved Unchange",
                     Toast.LENGTH_SHORT).show();
         }
+        //Save cropped image as a separate file and show toast that it has been saved
         else if(iv.getTag().toString() == croppedUri.toString()){
             File imgFile = new File(imgPath);
 
             if(imgFile != null){
-                Log.d("NOT NULL", imgFile.getAbsolutePath());
                 try{
-                    InputStream iStream =   getContentResolver().openInputStream(croppedUri);
-                    byte[] croppedData = getBytes(iStream);
-
-//                    FileOutputStream fos = new FileOutputStream(imgFile);
-//                    fos.write(croppedData);
-//                    fos.close();
-
+                    //Convert byte data to bitmap and save image to storage
                     Bitmap croppedBitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), croppedUri);
-
                     MediaStore.Images.Media.insertImage(getContentResolver(), croppedBitmap, null , null);
 
-
+                    //Show toast that image has been saved
                     Toast.makeText(
                             getApplicationContext(),
                             "Saved Cropped Image as a separate file",
@@ -103,27 +105,40 @@ public class DisplayImage extends AppCompatActivity {
                     e.printStackTrace();
                 }
             }
-
-
-
         }
-
     }
 
+    /**
+     * Method for undoing changes
+     * @param v view
+     */
     public void undoCrop(View v){
+        //Display original image
         iv.setImageURI(Uri.parse(imgPath));
         iv.setTag(imgPath);
+
+        //Show toast
         Toast.makeText(
                 getApplicationContext(),
                 "Undo cropping",
                 Toast.LENGTH_SHORT).show();
     }
 
+    /**
+     * On activity result after CropImage Activity
+     * @param requestCode
+     * @param resultCode
+     * @param data
+     */
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+
+        //Get result after CropImage activity
         if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
             CropImage.ActivityResult result = CropImage.getActivityResult(data);
+
+            //Display cropped image on preview
             if (resultCode == RESULT_OK) {
                 croppedUri = result.getUri();
                 iv.setImageURI(croppedUri);
@@ -134,20 +149,4 @@ public class DisplayImage extends AppCompatActivity {
             }
         }
     }
-
-    public byte[] getBytes(InputStream inputStream) throws IOException {
-        ByteArrayOutputStream byteBuffer = new ByteArrayOutputStream();
-        int bufferSize = 1024;
-        byte[] buffer = new byte[bufferSize];
-
-        int len = 0;
-        while ((len = inputStream.read(buffer)) != -1) {
-            byteBuffer.write(buffer, 0, len);
-        }
-        return byteBuffer.toByteArray();
-    }
-
-
-
-
 }

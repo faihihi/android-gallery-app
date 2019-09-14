@@ -16,6 +16,9 @@ import android.widget.FrameLayout;
 
 import java.io.ByteArrayOutputStream;
 
+/**
+ * Camera activity
+ */
 public class CameraActivity extends AppCompatActivity {
     private Camera camera;
     private ShowCamera showCamera;
@@ -23,6 +26,10 @@ public class CameraActivity extends AppCompatActivity {
 
     private Context myContext;
 
+    /**
+     * When camera is open
+     * @param savedInstanceState
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -49,22 +56,31 @@ public class CameraActivity extends AppCompatActivity {
             }
         });
 
+        /**
+         * When click capture, callback mPicture
+         * @param v view
+         */
         Button capturebutton = (Button) findViewById(R.id.capturebutton);
         capturebutton.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v){
                 camera.takePicture(null, null, mPicture);
-
             }
         });
     }
 
+    /**
+     * Callback function for saving captured image and start Preview activity
+     * @param data
+     * @param camera
+     */
     Camera.PictureCallback mPicture = new Camera.PictureCallback() {
         @Override
         public void onPictureTaken(byte[] data, Camera camera) {
-            //Convert byte array to Bitmap, rotate image, and store to device
+            //Convert byte array to Bitmap and rotate image
             Bitmap bitmap = BitmapFactory.decodeByteArray(data, 0, data.length);
             bitmap = rotateImage(90, bitmap);
+            //Store image bitmap to device
             MediaStore.Images.Media.insertImage(getContentResolver(), bitmap, null , null);
 
             //Convert back to byte array for passing byte array intent
@@ -72,13 +88,19 @@ public class CameraActivity extends AppCompatActivity {
             bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
             data = stream.toByteArray();
 
+            //Start new intent with image data and start ImagePreview activity
             Intent i = new Intent(CameraActivity.this, ImagePreviewActivity.class);
             i.putExtra("Image", data);
             startActivity(i);
-
         }
     };
 
+    /**
+     * Method for rotating image
+     * @param angle
+     * @param bitmapSrc
+     * @return rotated image bitmap
+     */
     public Bitmap rotateImage(int angle, Bitmap bitmapSrc) {
         Matrix matrix = new Matrix();
         matrix.postRotate(angle);
