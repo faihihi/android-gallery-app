@@ -12,8 +12,7 @@ import java.io.IOException;
  * ShowCamera class using SurfaceHolder
  * */
 public class ShowCamera extends SurfaceView implements SurfaceHolder.Callback {
-
-    //Set variables
+    // Set variables
     Camera camera;
     SurfaceHolder holder;
 
@@ -30,31 +29,30 @@ public class ShowCamera extends SurfaceView implements SurfaceHolder.Callback {
     }
 
     /**
-     * When camera surface is created
+     * When camera surface is created, set camera display orientation and parameters
      * @param holder
      * */
     @Override
     public void surfaceCreated(SurfaceHolder holder) {
         Camera.Parameters params = camera.getParameters();
 
-        //Change the orientation of the cameras
+        // Change the orientation of the cameras
         if(this.getResources().getConfiguration().orientation != Configuration.ORIENTATION_LANDSCAPE){
             params.set("orientation", "portrait");
             camera.setDisplayOrientation(90);
             params.setRotation(90);
-        }
-        else{
+        } else{
             params.set("orientation", "landscape");
             camera.setDisplayOrientation(0);
             params.setRotation(0);
         }
 
+        // Set camera parameters
         camera.setParameters(params);
         try{
             camera.setPreviewDisplay(holder);
             camera.startPreview();
-        }
-        catch(IOException e){
+        } catch(IOException e){
             e.printStackTrace();
         }
     }

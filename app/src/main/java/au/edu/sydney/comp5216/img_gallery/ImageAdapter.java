@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.database.Cursor;
 import android.net.Uri;
 import android.provider.MediaStore;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
@@ -18,8 +17,7 @@ import java.util.ArrayList;
 * ImageAdapter class for converting image item into view item
 */
 public class ImageAdapter extends BaseAdapter {
-
-    //Set variables
+    // Declare variables
     private Activity context;
     private ArrayList<String> images;
 
@@ -30,15 +28,16 @@ public class ImageAdapter extends BaseAdapter {
      * @param localContext
      */
     public ImageAdapter(Activity localContext){
+        // Set context and marshmallowpermission
         context = localContext;
         marshmallowPermission = new MarshmallowPermission(this.context);
-        //Get all images path in device storage
+        // Get all images path in device storage
         this.images = getAllShownImagesPath(context);
     }
 
     /**
      * Methods for Adapter: get size of images
-     * @return int size
+     * @return length of images list
      * */
     @Override
     public int getCount() {
@@ -47,7 +46,7 @@ public class ImageAdapter extends BaseAdapter {
 
     /**
      * Methods for Adapter: get item by position
-     * @return Object
+     * @return item object
      * */
     @Override
     public Object getItem(int position) {
@@ -56,7 +55,7 @@ public class ImageAdapter extends BaseAdapter {
 
     /**
      * Methods for Adapter: get item ID
-     * @return long position
+     * @return item ID number
      * */
     @Override
     public long getItemId(int position) {
@@ -65,26 +64,25 @@ public class ImageAdapter extends BaseAdapter {
 
 
     /**
-     * Methods for Adapter: get view
+     * Methods for Adapter: get gallery grid view using Glide
      * @param position
      * @param convertView
      * @param parent
-     * @return View picturesView
+     * @return picturesView of gallery grid
      * */
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         ImageView picturesView;
 
-        //Create new ImageView and set ScaleType
+        // Create new ImageView and set ScaleType
         if(convertView == null){
             picturesView = new ImageView(context);
             picturesView.setScaleType(ImageView.ScaleType.FIT_XY);
-        }
-        else{
+        } else{
             picturesView = (ImageView) convertView;
         }
 
-        //Use Glide to load image from device and put into ImageView
+        // Use Glide to load image from device and put into ImageView
         Glide.with(context).load(images.get(position))
                 .placeholder(R.drawable.ic_launcher_background).centerCrop()
                 .into(picturesView);
@@ -94,44 +92,44 @@ public class ImageAdapter extends BaseAdapter {
 
     /**
      * Get images list
-     * @return ArrayList<String> images
+     * @return list of images' path
      * */
     public ArrayList<String> getImages(){
         return images;
     }
 
     /**
-     * Get arraylist of all images path
+     * Get arraylist of all images path currently stored in device
      * @param activity
-     * @return ArrayList<String> listOfAllImages (all images path)
+     * @return listOfAllImages all images' path
      * */
     private ArrayList<String> getAllShownImagesPath(Activity activity){
-        Log.d("getAllShownImagesPath","IS RANNNNN");
         Uri uri;
         Cursor cursor;
         int column_idx_data;
         ArrayList<String> listOfAllImages = new ArrayList<String>();
         String absolutePathOfImage = null;
 
-        //Check for permission for read media file
+        // Check if permission for reading media file is given
         if (!marshmallowPermission.checkPermissionForReadfiles()) {
+            // Request for permission if not given
             marshmallowPermission.requestPermissionForReadfiles();
         } else {
-            //Get path to media storage
+            // Get path to external media storage
             uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
 
-            //Project to primary bucket display name of this media item
+            // Project to primary bucket display name of this media item
             String[] projection = {
                     MediaStore.MediaColumns.DATA, MediaStore.Images.Media.BUCKET_DISPLAY_NAME
             };
 
-            //Get query result and put into cursor
+            // Get query result and put into cursor
             cursor = activity.getContentResolver().query(uri, projection, null, null, null);
 
-            //Set index of column
+            // Set index of column
             column_idx_data = cursor.getColumnIndexOrThrow(MediaStore.MediaColumns.DATA);
 
-            //Loop through query result and add all image paths to arraylist
+            // Loop through query result and add all image paths to arraylist
             while(cursor.moveToNext()){
                 absolutePathOfImage = cursor.getString(column_idx_data);
                 listOfAllImages.add(absolutePathOfImage);

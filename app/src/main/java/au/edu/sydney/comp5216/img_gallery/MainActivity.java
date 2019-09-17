@@ -15,7 +15,7 @@ import androidx.appcompat.app.AppCompatActivity;
  * MainActivity of Image Gallery app
  */
 public class MainActivity extends AppCompatActivity {
-    //Set variables
+    // Set variables
     ImageAdapter imageAdapter;
     public static ArrayList<String> images = new ArrayList<String>();
 
@@ -23,7 +23,7 @@ public class MainActivity extends AppCompatActivity {
     MarshmallowPermission marshmallowPermission = new MarshmallowPermission(this);
 
     /**
-     * Display grid view
+     * Display grid view using custom image adapter
      * @param savedInstanceState
      * */
     @Override
@@ -32,27 +32,27 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         GridView gallery = (GridView) findViewById(R.id.galleryGridView);
 
-        //Create new adapter
+        // Create new adapter
         imageAdapter = new ImageAdapter(this);
 
-        //Set adapter for gallery
+        // Set adapter for gallery
         gallery.setAdapter(imageAdapter);
 
-        //Get list of images path
+        // Get list of images' path
         images = imageAdapter.getImages();
 
         /**
          * When an image on Gallery grid is clicked, start DisplayImage activity
          * intent with clicked image item is passed
-         * @param arg0
-         * @param arg1
-         * @param arg3
-         * @param position
+         * @param parent adapter view where the click happened
+         * @param view view within the AdapterView that was clicked
+         * @param position position of the view in the adapter
+         * @param id row id of the item that was clicked
          * */
         gallery.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
-            public void onItemClick(AdapterView<?> arg0, View arg1,
-                                    int position, long arg3) {
+            public void onItemClick(AdapterView<?> parent, View view,
+                                    int position, long id) {
                 if (null != images && !images.isEmpty()) {
                     Intent intent = new Intent(MainActivity.this, DisplayImage.class);
                     intent.putExtra("Image", images.get(position));
@@ -62,18 +62,19 @@ public class MainActivity extends AppCompatActivity {
         });
 
         /**
-         * When click Take Photo button
-         * Get permission for using camera and start Camera Activity
+         * When click Take Photo button, get permission for using camera
+         * and start Camera Activity
          * @param v view
          * */
         Button takePicture = (Button) findViewById(R.id.takePicture);
         takePicture.setOnClickListener(new View.OnClickListener(){
             public void onClick(View v){
-                //Check for camera permission
+                // Check if permission for using camera has been given
                 if (!marshmallowPermission.checkPermissionForCamera()) {
+                    // Request permission for using camera if not given
                     marshmallowPermission.requestPermissionForCamera();
                 } else {
-                    //Create intent and pass to CameraActivity
+                    // Start CameraActivity
                     Intent intent = new Intent(MainActivity.this, CameraActivity.class);
                     startActivity(intent);
                 }

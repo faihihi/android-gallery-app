@@ -9,10 +9,11 @@ import android.view.View;
 import android.widget.ImageView;
 
 /**
- * Image Preview Activity
+ * This activity start after the an imaged is captured and saved
+ * to preview the image
  * */
 public class ImagePreviewActivity extends Activity {
-    //Set variable
+    // Declare variable
     byte[] data;
 
     /**
@@ -23,26 +24,26 @@ public class ImagePreviewActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.image_view);
-
         ImageView iv = (ImageView)findViewById(R.id.previewImage);
-        Bundle extras = getIntent().getExtras();
 
+        // Get image data from previous activity
+        Bundle extras = getIntent().getExtras();
         if(extras != null){
             data = extras.getByteArray("Image");
         }
 
-        //Convert bytes array to Bitmap
+        // Convert bytes array to Bitmap
         Bitmap takenImage = BitmapFactory.decodeByteArray(data, 0, data.length);
 
-        //Load the taken image into a preview
+        // Load the taken image into a preview
         iv.setImageBitmap(takenImage);
         iv.setVisibility(View.VISIBLE);
     }
 
 
     /**
-     * Method for going back to Grid View by passing intent to MainActivity
-     * @param v
+     * Method for going back to Grid View by starting MainActivity
+     * @param v this view
      * */
     public void displayMain(View v){
         Intent intent = new Intent(this, MainActivity.class);
